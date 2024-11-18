@@ -1,57 +1,32 @@
 ---
-
-You can also start simply with 'default'
-========================================
-
-theme: default
-==============
-
-random image from a curated Unsplash collection by Anthony
-==========================================================
-
-like them? see https://unsplash.com/collections/94734566/slidev
-===============================================================
-
-background: https://cover.sli.dev
-=================================
-
+# You can also start simply with 'default'
+# theme: default
+# random image from a curated Unsplash collection by Anthony
+# like them? see https://unsplash.com/collections/94734566/slidev
+# background: https://cover.sli.dev
 background: https://source.unsplash.com/collection/94734566/1920x1080
+# some information about your slides (markdown enabled)
+title: Antrea Packetcapture Introduction
+info: |
+  ## Slidev Starter Template
+  API, DataPath, and Follow-up.
 
-some information about your slides (markdown enabled)
-=====================================================
-
-title: Antrea Packetcapture Introduction info: | ## Slidev Starter Template API, DataPath, and Follow-up.
-
-Learn more at [Sli.dev](https://sli.dev)
-
-apply unocss classes to the current slide
-=========================================
-
+  Learn more at [Sli.dev](https://sli.dev)
+# apply unocss classes to the current slide
 class: text-center
-
-https://sli.dev/features/drawing
-================================
-
-drawings: persist: false
-
-slide transition: https://sli.dev/guide/animations.html#slide-transitions
-=========================================================================
-
+# https://sli.dev/features/drawing
+drawings:
+  persist: false
+# slide transition: https://sli.dev/guide/animations.html#slide-transitions
 transition: slide-left
-
-enable MDC Syntax: https://sli.dev/features/mdc
-===============================================
-
+# enable MDC Syntax: https://sli.dev/features/mdc
 mdc: true
-
-take snapshot for each slide in the overview
-============================================
-
+# take snapshot for each slide in the overview
 overviewSnapshots: true
------------------------
+colorSchema: light
+---
 
-Antrea PacketCapture Introduction
-=================================
+# Antrea PacketCapture Introduction
 
 API, Datapath, and Follow-up
 
@@ -75,17 +50,18 @@ API, Datapath, and Follow-up
 The last comment block of each slide will be treated as slide notes. It will be visible and editable in Presenter Mode along with the slide. [Read more in the docs](https://sli.dev/guide/syntax.html#notes)
 -->
 
+
+---
+transition: fade-out
+layout: two-cols
+layoutClass: gap-16
+zoom: 0.8
 ---
 
-transition: fade-out layout: two-cols layoutClass: gap-16
 
-zoom: 0.8
----------
+# Current API
 
-Current API
-===========
-
-```yaml
+```yaml  {all|2|6-7|9-11|13-15|23|all} twoslash
 apiVersion: crd.antrea.io/v1alpha1
 kind: PacketCapture
 metadata:
@@ -116,11 +92,9 @@ spec:
       tcp:
         dstPort: 8080 
 ```
-
 ::right::
 
-Original Version
-================
+# Original Version
 
 ```yaml
 apiVersion: crd.antrea.io/v1alpha1
@@ -156,32 +130,33 @@ spec:
 ```
 
 ---
-
-transition: slide-up level: 2
-
-zoom: 0.95
-----------
-
-Datapath Options
-================
-
-| SOLUTION                   | DESCRIPTION                                                  | PROS                                          | CONS                                                 |
-|:--------------------------:|:------------------------------------------------------------:|:---------------------------------------------:|:----------------------------------------------------:|
-|            eBPF            |                     attach ebpf program                      | popular / high performance / active community | whole new teck stack/require certain kernel versions |
-|            ovs             |                 use existing antrea pipeline                 |         built-in / async (packet-in)          |          a bit of complicated for this case          |
-|      libbpf+gopacket       |              use libpf library and go interface              |                  well tested                  |          CGO required, a lot of ci changes           |
-| third-party go bpf library |                 pure go implemention of bpf                  |                  easy to use                  |                bugs, not much choice                 |
-|   our own bpf library ✅   | pure go implemention of bpf, but only a subset of the filter |      not hard to implement and maintain       |     extra concurrent layer around k8s controller     |
-
+transition: slide-up
+level: 2
+zoom: 0.85
 ---
 
-transition: slide-up level: 2 zoom: 0.8
+# Datapath Options
 
-layout: two-cols
-----------------
+| SOLUTION               | DESCRIPTION                                                  | PROS                                          | CONS                                                 |
+|:----------------------:|:------------------------------------------------------------:|:---------------------------------------------:|:----------------------------------------------------:|
+| eBPF                   | attach ebpf program                                          | popular / high performance / active community | whole new teck stack/require certain kernel versions |
+| ovs                    | use existing antrea pipeline                                 | built-in / async (packet-in)                  | a bit of complicated for this case                   |
+| libbpf+gopacket        | use libpf library and go interface                           | well tested                                   | CGO required, a lot of ci changes                    |
+| third-party go bpf library | pure go implemention of bpf                                  | easy to use                                   | bugs, not much choice                                |
+| our own bpf library ✅ | pure go implemention of bpf, but only a subset of the filter | not hard to implement and maintain            | extra concurrent layer around k8s controller         |
 
-Example
-=======
+
+
+---
+transition: slide-up
+level: 2
+zoom: 0.8
+layout:  two-cols
+---
+
+
+
+# Example
 
 Say i want to capture tcp traffic between two pods:
 
@@ -201,7 +176,6 @@ and dst host 10.244.1.3 and dst port 80"
 <v-click>
 
 An extra <code> -d </code> option would dump the following bpf instructions:
-
 ```asm
 (000) ldh      [12]
 (001) jeq      #0x800           jt 2	jf 14
@@ -219,15 +193,14 @@ An extra <code> -d </code> option would dump the following bpf instructions:
 (013) ret      #262144
 (014) ret      #0
 ```
-
 </v-click>
+
 
 ::right::
 
 <v-click>
 
-Golang Implemention
-===================
+# Golang Implemention
 
 translate the bpf instructions generated by `tcpdump` to go code:
 
@@ -257,35 +230,49 @@ func generateBPFInstructions() {
 	 ...
 }
 ```
-
 </v-click>
 
 ---
-
-layout: image image: /images/packet.jpg zoom: 1
-
+layout: image
+image: /images/packet.jpg
+zoom: 1
 backgroundSize: contain
------------------------
+---
 
 ---
 
-What's Next
-===========
+# What's Next
 
--	**Bi-Direction Capture** : source -> destination and destination -> source
--	**ICMP echo/reply filter**
--	**TCP flags** : for example `'tcp[13] & 16 != 0'` (all ack packets)
--	**IPv6**
--	...
+- **Bi-Direction Capture** : source -> destination and destination -> source
+- **ICMP echo/reply filter**
+- **TCP flags** : for example `'tcp[13] & 16 != 0'` (all ack packets)
+- **IPv6**
+- ...
+- **1 of N Sampling**: [https://www.kernel.org/doc/html/v6.1/networking/filter.html](https://www.kernel.org/doc/html/v6.1/networking/filter.html)
+
+```asm
+ldh [12]
+jne #0x800, drop
+ldb [23]
+jneq #1, drop
+ld rand # get a random uint32 number
+mod #4  # 1 out of 4
+jneq #1, drop
+ret #-1
+drop: ret #0
+```
+
 
 generate the bpf instructions using `tcpdump -d` and then translate them into golang code.
 
+
+---
+layout: center
+class: 'text-center pb-5 :'
 ---
 
-layout: center
+# Thank You !
 
-class: 'text-center pb-5 :'
----------------------------
+Welcome to try this feature out in the latest antrea release.
 
-Thank You !
-===========
+[https://github.com/antrea-io/antrea/releases/tag/v2.2.0](https://github.com/antrea-io/antrea/releases/tag/v2.2.0)
